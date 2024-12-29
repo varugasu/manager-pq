@@ -15,13 +15,12 @@ int main() {
   input.addDependency<PhysicsManager>();
   physics.addDependency<RendererManager>();
 
-  audio.start();
-  input.start();
-  physics.start();
-  renderer.start();
+  auto managers = topologicalSort({&audio, &input, &physics, &renderer});
+  for (auto& manager : managers) {
+    manager->start();
+  }
 
-  audio.shutdown();
-  input.shutdown();
-  physics.shutdown();
-  renderer.shutdown();
+  for (auto it = managers.rbegin(); it != managers.rend(); ++it) {
+    (*it)->shutdown();
+  }
 }
